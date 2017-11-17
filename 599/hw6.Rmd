@@ -1,0 +1,57 @@
+---
+title: "hw6_1"
+author: "Jingyuan"
+date: "2017年11月16日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+expr <- read.table(file= "imdb_tv_shows_ratings_2010.txt",
+                   header = TRUE,
+                   sep = "\t",
+                   comment.char = "#",
+                   stringsAsFactors = FALSE)
+dfvote <- gather(data = expr, key=star, value=votevalue, star_1:star_10)
+head(dfvote)
+starnumber <- extract(dfvote,star,c("star_number"),regex = "star_([0-9]+)",remove=FALSE)
+starnumber$star_number <- as.numeric(starnumber$star_number)  
+averagerate <- function(starnumber){
+  va <- sum(starnumber$votevalue * starnumber$star_number)/sum(starnumber$votevalue)
+  sumvoteva <- sum(starnumber$votevalue)
+  return ( data.frame(averatevalue=va, sumvotevalue = sumvoteva))
+}
+df4<-starnumber %>% 
+  group_by(name,season) %>%                         
+  do(averagerate(.))
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(fit)
+#some statistical techniques:
+#coefficients(fit) # model coefficients
+#confint(fit, level=0.95) # CIs for model parameters 
+#fitted(fit) # predicted values
+#residuals(fit) # residuals
+anova(fit) # anova table 
+#vcov(fit) # covariance matrix for model parameters 
+#influence(fit) # regression diagnostics
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+fit <- lm(season ~ averatevalue, df4)
+par(mfrow=c(2,2))
+plot(fit)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
